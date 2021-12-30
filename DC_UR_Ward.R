@@ -7,6 +7,7 @@ library(gganimate)
 library(lubridate)
 library(ggthemes)
 
+
 #Delete every 13th rw
 ####Nth.delete <- function(DC_Wards, n)DC_Wards[-(seq(n, to=nrow(DC_Wards),by=n)),]
 ####DC_Wards <- Nth.delete(DC_Wards, 13)
