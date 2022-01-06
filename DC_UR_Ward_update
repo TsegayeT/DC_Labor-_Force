@@ -1,0 +1,60 @@
+library(tidyverse)
+library(ggplot2)
+library(tidyr)
+library(readxl)
+library(gganimate)
+library(lubridate)
+library(ggthemes)
+
+
+
+#Delete every 13th rw
+####Nth.delete <- function(DC_Wards, n)DC_Wards[-(seq(n, to=nrow(DC_Wards),by=n)),]
+####DC_Wards <- Nth.delete(DC_Wards, 13)
+
+
+DC_Wards <- read_excel("C:/Users/ttsegaye/OneDrive - Government of The District of Columbia/Desktop/DC_Wards.xls")
+DC_Wards$Years <- str_c(DC_Wards$Month_Str, " ", DC_Wards$Year)
+
+DC_Wards <- DC_Wards %>% filter(Month != 13)
+
+sapply(DC_Wards, class)
+DC_Wards$Years <- my(DC_Wards$Years)
+
+
+#avg UR by year and ward
+DC_Wards %>% group_by(Year, `Area Title`) %>% 
+  mutate(avg_yr= mean(`Unemployment Rate`)) %>% 
+  select(`Area Title`, Years, `Unemployment Rate`, avg_yr) %>% 
+  head(15)
+
+DC_Wards %>% 
+  ggplot(aes(Years,`Unemployment Rate`, color = `Unemployment Rate`))+
+  geom_line(linetype = "solid")+
+  #geom_point(size = 4)+
+  geom_point(#aes(color = `Unemployment Rate`, 
+                 #color =after_scale(invert_color(color))),
+             size =1)+
+  geom_smooth(color = "white", alpha =0.5, size= 0.7)+
+  scale_color_gradient(low="green",
+                        high = "red", limits = c(2,22),
+                         breaks = seq(2,22,4))+
+  #scale_color_scico(palette = "hawaii", guide = "none")+
+  geom_rug()+
+  facet_grid(~ `Area Title`)+
+  labs(title = "Unemployment Rate by Ward Jan2015-Sept2021",
+       caption = "plot:@_ThomasT")+
+  scale_x_date(breaks = "year")+
+  scale_y_continuous(breaks = seq(0,22,1))+
+  theme_bw()+
+  labs(y = element_blank(),
+       x = element_blank())+
+  theme(axis.text.x = element_text(size = 8, angle =-45, 
+                                   vjust = 0.7, hjust=0.04),
+        plot.title = element_text(hjust = 0.5),
+        legend.position = c(0.5,0.9),
+        legend.background = element_rect(fill = "#FFFFFF"),
+        panel.background = element_rect(fill = "black",color = "black"),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_line(colour = "grey30"))+
+  guides(color = guide_legend(direction = "horizontal"))
